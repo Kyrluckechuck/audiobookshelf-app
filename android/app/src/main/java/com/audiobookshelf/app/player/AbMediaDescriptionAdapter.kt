@@ -8,11 +8,8 @@ import android.os.Build
 import android.provider.MediaStore
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
-import com.audiobookshelf.app.BuildConfig
-import com.audiobookshelf.app.R
 import com.audiobookshelf.app.data.BookChapter
 import com.audiobookshelf.app.data.PlaybackSession
-import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import kotlinx.coroutines.*

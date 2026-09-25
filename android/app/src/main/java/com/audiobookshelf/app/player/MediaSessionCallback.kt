@@ -247,7 +247,7 @@ class MediaSessionCallback(var playerNotificationService:PlayerNotificationServi
             playerNotificationService.jumpBackward()
           }
           KeyEvent.KEYCODE_MEDIA_STOP -> {
-            playerNotificationService.closePlayback()
+            playerNotificationService.pause()
           }
           else -> {
             Log.d(tag, "KeyCode:${keyEvent.keyCode}")

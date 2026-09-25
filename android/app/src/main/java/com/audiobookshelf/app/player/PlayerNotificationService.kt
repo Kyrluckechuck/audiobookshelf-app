@@ -373,8 +373,6 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
 
                 // Fix for local images crashing on Android 11 for specific devices
                 // https://stackoverflow.com/questions/64186578/android-11-mediastyle-notification-crash/64232958#64232958
-                // Also covers Android Auto, which can't read FileProvider URIs
-                // off the session metadata without an explicit grant.
                 currentPlaybackSession!!.grantCoverUriPermissions(ctx, coverUri)
 
                 val extra = Bundle()
@@ -398,16 +396,6 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
     setMediaSessionConnectorPlaybackActions()
     mediaSessionConnector.setQueueNavigator(queueNavigator)
     mediaSessionConnector.setPlaybackPreparer(MediaSessionPlaybackPreparer(this))
-    // Drives metadata both for our explicit invalidations and the connector's
-    // auto-invalidations (track transitions, EVENT_MEDIA_METADATA_CHANGED, etc.)
-    mediaSessionConnector.setMediaMetadataProvider { _ ->
-      val session: PlaybackSession? = currentPlaybackSession
-      if (session != null) {
-        session.getMediaMetadataCompat(ctx, chapterTrackEnabled, useAuthorAsChapterSubtitle, getCurrentTime())
-      } else {
-        MediaMetadataCompat.Builder().build()
-      }
-    }
 
     mediaSession.setCallback(MediaSessionCallback(this))
 
@@ -859,8 +847,6 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
     return currentPlaybackSession?.getChapterForTime(this.getCurrentTime())
   }
 
-  // --- Chapter-track support (used by ChapterAwareForwardingPlayer) -------
-
   fun isChapterTrackEnabled(): Boolean = chapterTrackEnabled
 
   fun isUseAuthorAsChapterSubtitleEnabled(): Boolean = useAuthorAsChapterSubtitle
@@ -892,7 +878,6 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
     return created
   }
 
-  // Invoked from JS via AbsAudioPlayer.setChapterTrack
   fun setChapterTrackEnabled(enabled: Boolean) {
     if (chapterTrackEnabled == enabled) return
     chapterTrackEnabled = enabled
@@ -904,7 +889,6 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
     refreshSystemUiMetadata()
   }
 
-  // Invoked from JS via AbsAudioPlayer.setUseAuthorAsChapterSubtitle
   fun setUseAuthorAsChapterSubtitleEnabled(enabled: Boolean) {
     if (useAuthorAsChapterSubtitle == enabled) return
     useAuthorAsChapterSubtitle = enabled
@@ -931,8 +915,7 @@ class PlayerNotificationService : MediaBrowserServiceCompat() {
     }
   }
 
-  // 1s tick mirrors iOS AudioPlayer.swift addPeriodicTimeObserver — refreshes
-  // the system UI when natural playback crosses a chapter boundary
+  // Refreshes system UI when natural playback crosses a chapter boundary.
   fun startChapterTicker() {
     if (chapterTickRunnable != null) return
     val handler = Handler(Looper.getMainLooper())

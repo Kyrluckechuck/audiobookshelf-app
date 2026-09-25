@@ -116,7 +116,6 @@ class PlaybackSession(
     return chapters.find { time >= it.startMs && it.endMs > time }
   }
 
-  // 1-based index of the chapter within [chapters], or 0 if not present
   @JsonIgnore
   fun getChapterDisplayNumber(chapter: BookChapter): Int {
     val idx: Int = chapters.indexOf(chapter)
@@ -245,8 +244,6 @@ class PlaybackSession(
   fun getMediaMetadataCompat(ctx: Context, chapterTrackEnabled: Boolean = false, useAuthorAsChapterSubtitle: Boolean = false, currentTimeOverrideMs: Long? = null): MediaMetadataCompat {
     val coverUri: Uri = getCoverUri(ctx)
 
-    // Local FileProvider URIs need explicit read permission for any process
-    // that will resolve them off the session metadata (lock screen, Android Auto)
     grantCoverUriPermissions(ctx, coverUri)
 
     // Match iOS NowPlayingInfo: chapter goes in the main title slot, secondary
