@@ -117,6 +117,7 @@ class PlaybackSession(
   }
 
   @JsonIgnore
+  // Chapters display 1-based; unknown chapters use 0.
   fun getChapterDisplayNumber(chapter: BookChapter): Int {
     val idx: Int = chapters.indexOf(chapter)
     return if (idx < 0) 0 else idx + 1
@@ -244,6 +245,7 @@ class PlaybackSession(
   fun getMediaMetadataCompat(ctx: Context, chapterTrackEnabled: Boolean = false, useAuthorAsChapterSubtitle: Boolean = false, currentTimeOverrideMs: Long? = null): MediaMetadataCompat {
     val coverUri: Uri = getCoverUri(ctx)
 
+    // System UI and Android Auto need a read grant for local cover art.
     grantCoverUriPermissions(ctx, coverUri)
 
     // Match iOS NowPlayingInfo: chapter goes in the main title slot, secondary
